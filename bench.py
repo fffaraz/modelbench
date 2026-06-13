@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Faraz Fallahi <fffaraz@gmail.com>
+#
 """ModelBench — ask every question in the bank to a local model and report pass/fail.
 
 Talks to any OpenAI-compatible server (LM Studio, Ollama, …). Single model:
