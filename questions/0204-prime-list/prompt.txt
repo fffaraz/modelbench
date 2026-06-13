@@ -1,0 +1,4 @@
+List all prime numbers less than 20, in increasing order.
+
+Reply with exactly one number per line. Output only the numbers — no commas, no
+numbering, no extra text.

@@ -1,0 +1,2 @@
+What is the next number in this sequence: 2, 6, 12, 20, 30, ?
+Reply with only the number.

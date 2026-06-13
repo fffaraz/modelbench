@@ -1,0 +1,3 @@
+Write a Python program that prints the string `Hello, World!` with its characters
+in reverse order, on a single line. Output only the program inside a single ```python
+code block.

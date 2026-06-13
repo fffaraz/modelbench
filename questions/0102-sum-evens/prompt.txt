@@ -1,0 +1,3 @@
+Write a Python program that prints the sum of all even numbers from 1 to 100
+inclusive. Output only the single number, and put the program inside a single
+```python code block.

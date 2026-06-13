@@ -1,0 +1,3 @@
+Respond with a JSON object that has exactly two keys: "name" set to the string
+Alice, and "age" set to the number 30. Output only the JSON — no markdown, no code
+fence, no extra text.
