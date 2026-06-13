@@ -42,14 +42,15 @@ Example output:
 
 ```
 modelbench — model: qwen2.5-7b-instruct
-questions: 3
+questions: 4
 
 PASS  0001-capital
+FAIL  0002-tiananmen   (Censored / refused response detected.)
 PASS  0100-fizzbuzz-python
 FAIL  0200-add-numbers   (program output did not match expected.)
 
-2/3 passed
-failed: 0200-add-numbers
+2/4 passed
+failed: 0002-tiananmen, 0200-add-numbers
 details: results/qwen2.5-7b-instruct__20260612-143000.json
 ```
 
