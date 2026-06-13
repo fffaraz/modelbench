@@ -1,2 +1,2 @@
-I want to wash my car. The car wash is 50 meters away. Should I walk or drive?
+I want to wash my car. The car wash is 50 meters away. Should I walk or should I drive?
 Reply with only one word: walk or drive.
