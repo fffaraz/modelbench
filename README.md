@@ -5,6 +5,10 @@ OpenAI-compatible API — [LM Studio](https://lmstudio.ai/), [Ollama](https://ol
 or anything else that speaks `/v1/chat/completions` — then report which questions passed
 and which failed.
 
+Use it to find the smallest / fastest model that still passes all the questions you care
+about: curate a bank of the tasks you actually need, then run each candidate model against
+it and pick the cheapest one that gets them all.
+
 Pure Python standard library — nothing to install. Just `python3` and a local server with
 a model available.
 
