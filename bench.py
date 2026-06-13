@@ -312,12 +312,12 @@ def main():
     if not (argv and (argv[0] in sub.choices or argv[0] in ("-h", "--help"))):
         argv = ["run"] + argv
     args = p.parse_args(argv)
-    try:
-        args.func(args)
-    except KeyboardInterrupt:
-        print("\nInterrupted by user.", file=sys.stderr)
-        sys.exit(130)
+    args.func(args)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nInterrupted by user.", file=sys.stderr)
+        sys.exit(130)
