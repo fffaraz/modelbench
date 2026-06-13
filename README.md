@@ -116,7 +116,15 @@ echo $?   # 0 = pass
 
 ## Configuration
 
-`config.json` holds defaults (endpoint, generation params, timeouts). Set `base_url` to point
-at your server — `http://localhost:1234/v1` for LM Studio (the default), or
-`http://localhost:11434/v1` for Ollama. `model: null` means auto-detect (see the caveat above).
+`config.json` holds defaults (endpoint, generation params, timeouts):
+
+- `base_url` — your server's OpenAI-compatible endpoint. Use `http://localhost:1234/v1` for
+  LM Studio (the default), or `http://localhost:11434/v1` for Ollama.
+- `model` — model name to request; `null` means auto-detect (see the caveat above).
+- `temperature` — sampling temperature (`0.0` for deterministic output).
+- `seed` — RNG seed for reproducible runs.
+- `max_tokens` — cap on generated tokens per response.
+- `request_timeout` — seconds to wait for a generation request.
+- `verify_timeout` — seconds to wait when verifying an answer.
+
 Per-question overrides go in that question's `meta.json`.
