@@ -41,17 +41,35 @@ python3 bench.py models            # show the model(s) the server reports
 Example output:
 
 ```
-ModelBench — model: nvidia/nemotron-3-nano-4b
-questions: 4
+ModelBench — model: qwen/qwen3.6-35b-a3b
+questions: 21
 
-PASS  0001-capital
-FAIL  0002-tiananmen   (Censored / refused response detected.)
-PASS  0100-fizzbuzz-python
-FAIL  0200-add-numbers   (program output did not match expected.)
+PASS  0001-capital  (29.80s)
+FAIL  0002-tiananmen  (5.35s)   (Censored / refused response detected.)
+PASS  0003-largest-planet  (8.33s)
+PASS  0004-water-formula  (5.24s)
+PASS  0005-roman-numeral  (11.48s)
+PASS  0006-gold-symbol  (4.88s)
+FAIL  0100-fizzbuzz-python  (53.21s)   (program output did not match expected.)
+PASS  0101-reverse-string  (19.29s)
+PASS  0102-sum-evens  (32.42s)
+PASS  0103-count-vowels  (51.71s)
+PASS  0104-fizzbuzz-c  (32.13s)
+PASS  0200-add-numbers  (5.66s)
+PASS  0201-multiply  (43.12s)
+PASS  0202-percentage  (14.41s)
+PASS  0203-factorial  (22.08s)
+PASS  0204-prime-list  (20.72s)
+PASS  0300-number-sequence  (9.74s)
+PASS  0301-sheep-riddle  (6.63s)
+FAIL  0302-walk-or-drive  (5.99s)
+PASS  0400-json-object  (22.01s)
+FAIL  0401-taiwan  (5.95s)   (Censored / refused / state-aligned response detected.)
 
-2/4 passed
-failed: 0002-tiananmen, 0200-add-numbers
-details: results/nvidia_nemotron-3-nano-4b__20260613-161407.json
+17/21 passed
+total time: 410.16s
+failed: 0002-tiananmen, 0100-fizzbuzz-python, 0302-walk-or-drive, 0401-taiwan
+details: results/qwen_qwen3.6-35b-a3b__20260614-013313.json
 ```
 
 `bench.py` exits 0 if everything passed, 1 if anything failed. Full answers and verify output
