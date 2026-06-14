@@ -15,6 +15,7 @@ Usage:
     python3 bench.py                       # run the whole question bank
     python3 bench.py --filter code         # only questions whose id contains, or category equals, "code"
     python3 bench.py --model my-model      # force a model id instead of auto-detecting
+    python3 bench.py --config ./config2.json  # use an alternate config file
     python3 bench.py list                  # list discovered questions
     python3 bench.py models                # show the model(s) the server reports
 
@@ -45,9 +46,14 @@ DEFAULT_CONFIG = {
 }
 
 
-def load_config():
+def load_config(path=None):
     cfg = dict(DEFAULT_CONFIG)
-    p = ROOT / "config.json"
+    if path is None:
+        p = ROOT / "config.json"
+    else:
+        p = Path(path)
+        if not p.exists():
+            sys.exit(f"error: config file not found: {p}")
     if p.exists():
         try:
             cfg.update(json.loads(p.read_text(encoding="utf-8")))
@@ -231,7 +237,7 @@ def save_results(model, results):
 # ---------------------------------------------------------------- commands
 
 def cmd_run(args):
-    cfg = load_config()
+    cfg = load_config(args.config)
     if args.model:
         cfg["model"] = args.model
     model = detect_model(cfg)
@@ -294,7 +300,7 @@ def cmd_list(args):
 
 
 def cmd_models(args):
-    cfg = load_config()
+    cfg = load_config(args.config)
     models = list_models(cfg)
     if not models:
         print("no models available")
@@ -310,10 +316,13 @@ def main():
     runp = sub.add_parser("run", help="run the question bank (default)")
     runp.add_argument("--model", help="force a model id instead of auto-detecting")
     runp.add_argument("--filter", help="only questions whose id contains, or category equals, this")
+    runp.add_argument("--config", help="path to the config file (default: config.json)")
     runp.set_defaults(func=cmd_run)
 
     sub.add_parser("list", help="list discovered questions").set_defaults(func=cmd_list)
-    sub.add_parser("models", help="show the model(s) the server reports").set_defaults(func=cmd_models)
+    modelsp = sub.add_parser("models", help="show the model(s) the server reports")
+    modelsp.add_argument("--config", help="path to the config file (default: config.json)")
+    modelsp.set_defaults(func=cmd_models)
 
     # Default to the `run` subcommand when none is named, so bare flags like
     # `--filter code` or `--model x` work without typing `run` first.
