@@ -52,8 +52,17 @@ One pipeline in `bench.py`, run per question by `cmd_run`:
 ### The verify-script contract (the core extension point)
 
 `find_verify()` resolves the verify command in this precedence order:
-`meta.json` `"verify"` string (run via shell) → `verify.sh` (bash) → `verify.py`
+`meta.json` `"verify"` string (run via shell) → **`category == "code"` → the shared
+`check_code.py`** (no per-question script; see below) → `verify.sh` (bash) → `verify.py`
 (current interpreter) → executable `verify`. First match wins.
+
+**Code questions are verified by the shared `check_code.py` at the repo root — they do not
+ship their own verify script.** When a question's `category` is `"code"`, `find_verify()`
+auto-builds `python3 check_code.py <lang> expected_output.txt`. `<lang>` comes from
+`meta.json` `"lang"` (default `"python"`; `"c"` is the only other supported value for now).
+The script extracts a fenced code block from the model's answer, runs it (compiling first
+for C), and diffs its stdout against `expected_output.txt`. Add a language by extending the
+`LANGS` table in `check_code.py`.
 
 When `run_verify()` runs it:
 - **cwd = the question's own directory**, so support files (`expected.txt`,
@@ -75,17 +84,19 @@ When `run_verify()` runs it:
 - Two reusable verify patterns already exist — copy rather than reinvent:
   - **string/regex match** (knowledge/math): see `questions/0001-capital/verify.sh`
     (normalize-then-compare against `expected.txt`).
-  - **run generated code and diff stdout** (code): see `questions/0100-fizzbuzz-python/verify.py`
-    (Python) and `questions/0104-fizzbuzz-c/verify.py` (compile + run C), both extracting a
-    fenced ```` ```code``` ```` block then comparing to `expected_output.txt`.
-- `meta.json` (all optional): `category`, `system`, `temperature`, `max_tokens`,
-  `verify_timeout`, and a `verify` command override. Per-question values override `config.json`.
+  - **run generated code and diff stdout** (code): handled centrally by `check_code.py`. A
+    code question needs no verify script — just `category: "code"`, the right `lang`, and an
+    `expected_output.txt`.
+- `meta.json` (all optional): `category`, `lang` (for `code` questions: `python`/`c`),
+  `system`, `temperature`, `max_tokens`, `verify_timeout`, and a `verify` command override.
+  Per-question values override `config.json`.
 
 ### Adding or changing things
 
-- **New question:** make `questions/NNNN-name/`, add `prompt.txt`, add a verify script that
-  exits 0 on a correct answer (copy the closest existing pattern), add any `expected*.txt`,
-  and a `meta.json` with the matching `category`.
-- Code-running verify scripts execute model output on the host. Existing ones use temp files
-  and tight `subprocess` timeouts; keep that, and prefer Docker (a `Dockerfile` in the question
-  dir is in the verify cwd) when running untrusted output is a concern.
+- **New question:** make `questions/NNNN-name/`, add `prompt.txt` and a `meta.json` with the
+  matching `category`. For a `code` question, also add `expected_output.txt` and set `lang`
+  — no verify script. For other categories, add a verify script that exits 0 on a correct
+  answer (copy the closest existing pattern) plus any `expected*.txt`.
+- `check_code.py` executes model output on the host. It uses temp files and tight
+  `subprocess` timeouts; keep that, and prefer Docker (a `Dockerfile` in the question dir is
+  in the verify cwd) when running untrusted output is a concern.

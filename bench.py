@@ -34,6 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 QUESTIONS_DIR = ROOT / "questions"
 RESULTS_DIR = ROOT / "results"
+CHECK_CODE = ROOT / "check_code.py"  # shared verifier for "code" questions
 
 DEFAULT_CONFIG = {
     "base_url": "http://localhost:1234/v1",  # LM Studio; use :11434/v1 for Ollama
@@ -155,9 +156,23 @@ def discover_questions():
 
 
 def find_verify(d, meta):
-    """Locate the question's verify command. Returns {'cmd', 'shell', 'label'} or None."""
+    """Locate the question's verify command. Returns {'cmd', 'shell', 'label'} or None.
+
+    "code" questions don't ship their own verify script: they're checked by the shared
+    check_code.py (run the model's code, diff its stdout against expected_output.txt). The
+    language comes from meta.json "lang" (default "python"). An explicit meta.json "verify"
+    still wins, and other categories fall back to a per-question verify script.
+    """
     if meta.get("verify"):
         return {"cmd": meta["verify"], "shell": True, "label": str(meta["verify"])}
+    if meta.get("category") == "code":
+        lang = meta.get("lang", "python")
+        expected = d / "expected_output.txt"
+        return {
+            "cmd": [sys.executable, str(CHECK_CODE), lang, str(expected)],
+            "shell": False,
+            "label": f"check_code.py {lang}",
+        }
     for name, prefix in (("verify.sh", ["bash"]), ("verify.py", [sys.executable]), ("verify", [])):
         p = d / name
         if p.exists():

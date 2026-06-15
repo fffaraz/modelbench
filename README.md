@@ -88,11 +88,18 @@ questions/0001-capital/
   meta.json         # optional settings (see below)
 ```
 
+**Code questions are the exception:** any question with `"category": "code"` is checked by the
+shared `check_code.py` and needs no verify script of its own — just an `expected_output.txt`
+and a `"lang"` in `meta.json` (`python` or `c`). The harness extracts the code from the
+model's answer, runs it (compiling first for C), and diffs its stdout against
+`expected_output.txt`.
+
 ### The verify-script contract
 
-The harness sends the prompt, then runs the question's verify script (`verify.sh`, `verify.py`,
-or an executable `verify`; auto-detected). The script decides everything — string match, regex,
-or extract code and run it (inside Docker or not) and diff an expected-output file.
+For non-code questions, the harness sends the prompt, then runs the question's verify script
+(`verify.sh`, `verify.py`, or an executable `verify`; auto-detected). The script decides
+everything — string match, regex, or extract code and run it (inside Docker or not) and diff an
+expected-output file.
 
 When the script runs:
 
@@ -116,6 +123,7 @@ echo $?   # 0 = pass
 ```json
 {
   "category": "code",
+  "lang": "python",
   "system": "You are a terse assistant.",
   "temperature": 0.0,
   "max_tokens": 1024,
@@ -123,14 +131,21 @@ echo $?   # 0 = pass
 }
 ```
 
+`lang` only applies to `code` questions (`python` or `c`); it selects how `check_code.py`
+runs the answer.
+
 ## Adding a question
 
 1. `mkdir questions/0300-my-question`
 2. Write `prompt.txt`.
-3. Write a `verify.sh` or `verify.py` that exits 0 on a correct answer. For programming
-   questions, see `questions/0100-fizzbuzz-python/verify.py` — it reads the answer from stdin,
-   extracts the ```python block, runs it, and diffs `expected_output.txt`. A verify script is
-   free to run the code inside Docker (any `Dockerfile` in the question folder is in the cwd).
+3. Decide how it's checked:
+   - **Code question:** set `"category": "code"` and `"lang"` in `meta.json`, and add an
+     `expected_output.txt`. No verify script — `check_code.py` runs the model's code and diffs
+     its stdout. See `questions/0100-fizzbuzz-python/` (Python) or `questions/0104-fizzbuzz-c/`
+     (C).
+   - **Anything else:** write a `verify.sh` or `verify.py` that exits 0 on a correct answer
+     (the model's answer arrives on stdin). It's free to run code inside Docker (any
+     `Dockerfile` in the question folder is in the cwd).
 
 ## Configuration
 
