@@ -1,0 +1,15 @@
+Below is a list of chemical elements. For each one, give its chemical symbol.
+
+Reply with exactly one symbol per line, in the same order as the elements
+below. Output only the symbols — no numbering, no element names, no extra text.
+
+Hydrogen
+Oxygen
+Carbon
+Nitrogen
+Sodium
+Iron
+Gold
+Silver
+Copper
+Helium
