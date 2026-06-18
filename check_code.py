@@ -92,8 +92,12 @@ def main():
 
     stdin_data = None
     if input_path is not None:
-        with open(input_path) as f:
-            stdin_data = f.read()
+        try:
+            with open(input_path, encoding="utf-8") as f:
+                stdin_data = f.read()
+        except (OSError, UnicodeDecodeError) as e:
+            print(f"error: cannot read input file {input_path}: {e}", file=sys.stderr)
+            sys.exit(1)
 
     fence, runner = LANGS[lang]
     code = extract_code(sys.stdin.read(), fence)
@@ -104,8 +108,13 @@ def main():
         print(proc.stderr, file=sys.stderr)
         sys.exit(1)
 
-    with open(expected_path) as f:
-        expected = f.read().strip()
+    try:
+        with open(expected_path, encoding="utf-8") as f:
+            expected = f.read().strip()
+    except (OSError, UnicodeDecodeError) as e:
+        print(f"error: cannot read expected output file {expected_path}: {e}", file=sys.stderr)
+        sys.exit(1)
+
     got = proc.stdout.strip()
     if got == expected:
         sys.exit(0)

@@ -174,7 +174,10 @@ def find_verify(d, meta):
             return {"cmd": [str(p)], "shell": False, "label": name}
     if meta.get("category") == "code":
         lang = meta.get("lang", "python")
-        cmd = [sys.executable, str(CHECK_CODE), lang, str(d / "expected_output.txt")]
+        expected = d / "expected_output.txt"
+        if not expected.exists():
+            return None  # configuration error; run_verify will report clearly
+        cmd = [sys.executable, str(CHECK_CODE), lang, str(expected)]
         if (d / "input.txt").exists():
             cmd.append(str(d / "input.txt"))
         return {"cmd": cmd, "shell": False, "label": f"check_code.py {lang}"}
@@ -190,8 +193,12 @@ def run_verify(q, model, answer, timeout):
     """
     v = q["verify"]
     if v is None:
-        return {"passed": False, "exit": None, "score": 0.0,
-                "output": "no way to verify: no verify script, and category is not 'code'"}
+        cat = q["meta"].get("category")
+        if cat == "code":
+            msg = "no way to verify: missing expected_output.txt for code question"
+        else:
+            msg = "no way to verify: no verify script, and category is not 'code'"
+        return {"passed": False, "exit": None, "score": 0.0, "output": msg}
     env = dict(
         os.environ,
         MODELBENCH_MODEL=model,
@@ -265,6 +272,15 @@ def cmd_run(args):
                      if f in q["id"] or f == q["meta"].get("category")]
     if not questions:
         sys.exit("error: no questions matched.")
+
+    # Fail fast for questions that cannot be verified (e.g. code category without expected_output.txt,
+    # or non-code without a verify script). This avoids wasted model inference calls.
+    # (cmd_list will still surface them with a red warning.)
+    unverifiable = [q["id"] for q in questions if q["verify"] is None]
+    if unverifiable:
+        sys.exit("error: the following questions have no verify method and cannot be checked: " +
+                 ", ".join(unverifiable) +
+                 "\n  (non-code questions need verify.sh or verify.py; code questions need expected_output.txt)")
 
     print(f"ModelBench — model: {color(model, 'bold')}")
     print(f"questions: {len(questions)}\n")
