@@ -5,7 +5,7 @@ stdin), run it, and compare its stdout to an expected-output file. exit 0 = pass
 Usage:
     python3 ../../check_code.py <lang> <expected_output_path> [input_path]
 
-<lang> is "python" (aka "py") or "c". The expected-output path (and the optional input path)
+<lang> is "python", "c", or "cpp". The expected-output path (and the optional input path)
 are resolved relative to the verify cwd, which bench.py sets to the question's own directory
 -- so "expected_output.txt" finds the file sitting next to prompt.txt. When [input_path] is
 given, its contents are fed to the generated program on stdin; otherwise the program gets no
@@ -83,13 +83,11 @@ def run_cpp(code, stdin_data):
     return _run_compiled(code, stdin_data, ("c++", "g++", "clang++"), "prog.cpp", "C++")
 
 
-# lang -> (code-fence alternatives, runner)
+# lang -> (code-fence tag, runner). One canonical lang/fence each -- no aliases.
 LANGS = {
-    "python": (r"python|py", run_python),
-    "py": (r"python|py", run_python),
+    "python": (r"python", run_python),
     "c": (r"c", run_c),
-    "cpp": (r"cpp|c\+\+", run_cpp),
-    "c++": (r"cpp|c\+\+", run_cpp),
+    "cpp": (r"cpp", run_cpp),
 }
 
 

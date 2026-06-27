@@ -61,8 +61,8 @@ with a proper shebang — `#!/usr/bin/env bash`, `#!/usr/bin/env python3`, etc.
 **Code questions don't need their own verify script — the shared `check_code.py` at the repo
 root checks them.** When a `"code"` question has no verify script of its own, `find_verify()`
 auto-builds `python3 check_code.py <lang> expected_output.txt [input.txt]`. `<lang>` comes
-from `meta.json` `"lang"` (default `"python"`; `"c"` and `"cpp"`/`"c++"` are the other
-supported values). The script extracts a fenced code block from the model's answer, runs it
+from `meta.json` `"lang"` (default `"python"`; `"c"` and `"cpp"` are the other supported
+values). The script extracts a fenced code block from the model's answer, runs it
 (compiling first for C/C++), and diffs its stdout against `expected_output.txt`. If the question dir has an
 `input.txt`, its contents are fed to the program on stdin (the optional third arg); otherwise
 the program gets no stdin. Add a language by extending the `LANGS` table in `check_code.py`.
