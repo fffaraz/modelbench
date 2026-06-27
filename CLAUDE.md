@@ -61,9 +61,9 @@ with a proper shebang — `#!/usr/bin/env bash`, `#!/usr/bin/env python3`, etc.
 **Code questions don't need their own verify script — the shared `check_code.py` at the repo
 root checks them.** When a `"code"` question has no verify script of its own, `find_verify()`
 auto-builds `python3 check_code.py <lang> expected_output.txt [input.txt]`. `<lang>` comes
-from `meta.json` `"lang"` (default `"python"`; `"c"` is the only other supported value for
-now). The script extracts a fenced code block from the model's answer, runs it (compiling
-first for C), and diffs its stdout against `expected_output.txt`. If the question dir has an
+from `meta.json` `"lang"` (default `"python"`; `"c"` and `"cpp"`/`"c++"` are the other
+supported values). The script extracts a fenced code block from the model's answer, runs it
+(compiling first for C/C++), and diffs its stdout against `expected_output.txt`. If the question dir has an
 `input.txt`, its contents are fed to the program on stdin (the optional third arg); otherwise
 the program gets no stdin. Add a language by extending the `LANGS` table in `check_code.py`.
 (A code question may still ship its own verify script to override this — per the precedence
@@ -92,7 +92,7 @@ When `run_verify()` runs it:
   - **run generated code and diff stdout** (code): handled centrally by `check_code.py`. A
     code question needs no verify script — just `category: "code"`, the right `lang`, and an
     `expected_output.txt`.
-- `meta.json` (all optional): `category`, `lang` (for `code` questions: `python`/`c`),
+- `meta.json` (all optional): `category`, `lang` (for `code` questions: `python`/`c`/`cpp`),
   `system`, `temperature`, `max_tokens`, `verify_timeout`. Per-question values override
   `config.json`.
 

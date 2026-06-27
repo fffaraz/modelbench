@@ -43,17 +43,18 @@ def run_python(code, stdin_data):
         os.unlink(code_path)
 
 
-def run_c(code, stdin_data):
-    """Compile the code, then run the binary, feeding stdin_data on stdin (None = no input).
-    Returns a CompletedProcess, or exits on a compile error / missing compiler (those are
-    failures, not runnable programs)."""
-    cc = shutil.which("cc") or shutil.which("gcc") or shutil.which("clang")
+def _run_compiled(code, stdin_data, compilers, src_name, label):
+    """Compile the code with the first available compiler, then run the binary, feeding
+    stdin_data on stdin (None = no input). Returns a CompletedProcess, or exits on a compile
+    error / missing compiler (those are failures, not runnable programs). src_name's extension
+    selects the compiler's language mode (e.g. prog.c -> C, prog.cpp -> C++)."""
+    cc = next((shutil.which(c) for c in compilers if shutil.which(c)), None)
     if cc is None:
-        print("no C compiler (cc/gcc/clang) found on PATH", file=sys.stderr)
+        print(f"no {label} compiler ({'/'.join(compilers)}) found on PATH", file=sys.stderr)
         sys.exit(1)
 
     tmp = tempfile.mkdtemp()
-    src_path = os.path.join(tmp, "prog.c")
+    src_path = os.path.join(tmp, src_name)
     bin_path = os.path.join(tmp, "prog")
     try:
         with open(src_path, "w") as f:
@@ -72,11 +73,23 @@ def run_c(code, stdin_data):
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def run_c(code, stdin_data):
+    """Compile and run C code (prog.c, compiled in C mode by cc/gcc/clang)."""
+    return _run_compiled(code, stdin_data, ("cc", "gcc", "clang"), "prog.c", "C")
+
+
+def run_cpp(code, stdin_data):
+    """Compile and run C++ code (prog.cpp, compiled in C++ mode by c++/g++/clang++)."""
+    return _run_compiled(code, stdin_data, ("c++", "g++", "clang++"), "prog.cpp", "C++")
+
+
 # lang -> (code-fence alternatives, runner)
 LANGS = {
     "python": (r"python|py", run_python),
     "py": (r"python|py", run_python),
-    "c": (r"c|cpp|c\+\+", run_c),
+    "c": (r"c", run_c),
+    "cpp": (r"cpp|c\+\+", run_cpp),
+    "c++": (r"cpp|c\+\+", run_cpp),
 }
 
 

@@ -90,8 +90,8 @@ questions/0001-capital/
 
 **Code questions are the exception:** any question with `"category": "code"` is checked by the
 shared `check_code.py` and needs no verify script of its own — just an `expected_output.txt`
-and a `"lang"` in `meta.json` (`python` or `c`). The harness extracts the code from the
-model's answer, runs it (compiling first for C), and diffs its stdout against
+and a `"lang"` in `meta.json` (`python`, `c`, or `cpp`). The harness extracts the code from the
+model's answer, runs it (compiling first for C/C++), and diffs its stdout against
 `expected_output.txt`.
 
 ### The verify-script contract
@@ -132,7 +132,7 @@ echo $?   # 0 = pass
 }
 ```
 
-`lang` only applies to `code` questions (`python` or `c`); it selects how `check_code.py`
+`lang` only applies to `code` questions (`python`, `c`, or `cpp`); it selects how `check_code.py`
 runs the answer.
 
 ## Adding a question
